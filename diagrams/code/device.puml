@@ -1,0 +1,55 @@
+@startuml
+class "devices/{id_or_slug}/monitor" as Controller {
+  -DashboardService
+  +get_device_monitor(id_or_slug:str)
+}
+
+class DashboardService {
+   -DataBaseRepository
+  -TemperatureDeviceGateWay
+  -GatesDeviceGateWay
+  -LightDeviceGateWay
+  -VideoDeviceGateWay
+  -EventGateWay
+  -_get_device_type_by_id(id_or_slug:str)
+  +get_device_monitor(id_or_slug:str)
+  +get_device_monitor_history(id_or_slug:str, start_date: datetime, end_date:datetime)
+  +get_device_alert_history(id_or_slug:str, start_date: datetime, end_date:datetime)
+}
+
+class DataBaseRepository {
+    -DBClient
+    +get_device_type_by_id(device_id:str)
+}
+
+class TemperatureDeviceGateWay {
+  -TemperatureDeviceAdapter
+  +get_device_info_by_id(device_id:str)
+  +get_device_by_id(device_id:str)
+  +register_new_device(*args, **kwargs)
+  +change_device_settings(*args, **kwargs)
+  +remove_device(*args, **kwargs)
+}
+
+class EventGateWay {
+  -QueueAdapter
+  +send_alert(event_id: str, payload:dict)
+}
+
+class TemperatureDeviceAdapter {
+    -HTTPClient
+}
+
+class QueueAdapter {
+  -Client
+  +send_event(event_id: str, payload:dict)
+  -serialize_payload(payload: dict)
+}
+
+Controller 	--> DashboardService
+DashboardService --> TemperatureDeviceGateWay
+DashboardService --> DataBaseRepository
+TemperatureDeviceGateWay --> TemperatureDeviceAdapter
+DashboardService --> EventGateWay
+EventGateWay --> QueueAdapter
+@enduml

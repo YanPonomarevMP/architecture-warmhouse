@@ -1,0 +1,21 @@
+@startuml
+!include <C4/C4_Component>
+
+ContainerDb(database, "Database", "SQL DB")
+System_Ext(communication_channel, "Канал коммуникации", "SMTP-сервер, SMS-сервер")
+
+Container(noty_api, "Нотификации", "Уведомления пользователей, создание шаблонов писем") {
+    Component(api, "API", "Rest API")
+    Component(template_engine, "Шаблонизатор", "Создание шаблонов для писем")
+    Component(consumer, "Консьюмер", "Асинхронно отправляет сообщения")
+    Component(queue, "Брокер сообщений", "Очередь для асинхронного взаимодействия между компонентами")
+
+    Rel_D(api, template_engine, "Создание шаблонов")
+    Rel_D(api, queue, "Асинхронная отправка сообщений")
+    Rel_D(queue, consumer, "Асинхронная отправка сообщений")
+}
+
+Rel_D(template_engine, database, "Запись")
+Rel_D(consumer, database, "Запись")
+Rel_D(consumer, communication_channel, "Отправка сообщения")
+@enduml

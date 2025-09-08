@@ -1,0 +1,85 @@
+@startchen
+
+entity "Пользователь" as user {
+    id
+    login
+    "ФИО" as Name
+    email
+    msisdn
+    права доступа
+}
+entity "Устройство" as device {
+    id
+    type {
+        id
+    }
+    s_number
+    location {
+        id
+    }
+    status
+}
+entity "Диспетчер устройств" as  saas1 {
+}
+entity "Дашборды" as  saas2 {
+}
+entity "Пульт управления" as  saas3 {
+}
+entity "Дом" as  location {
+    id
+    user_id
+    адрес
+}
+entity "Покупки" as  billing {
+}
+entity "Тип устройства" as device_type {
+    id
+    settings
+    driver
+}
+relationship "Настройка устройства" as crud {
+}
+relationship "Мониторинг" as dush {
+}
+relationship "Удалённое управление" as remote {
+}
+relationship "Регистрация адреса" as addr {
+}
+relationship "Привязка устройства" as placement {
+}
+relationship "Покупка услуг" as buy {
+}
+relationship "Выбор типа устройства" as driver {
+}
+relationship "Выдача прав доступа" as issue {
+}
+relationship "Нотификация" as notify {
+}
+
+user -1- crud
+user -1- dush
+user -1- remote
+user -1- buy
+user -1- addr
+addr -N- location
+
+crud -N- saas1
+dush -N- saas2
+remote -N- saas3
+saas1 -N- device
+saas2 -N- device
+saas3 -N- device
+buy -N- billing
+device -N- placement
+placement -1- location
+device -N- driver
+driver -1- device_type
+billing -N- issue
+issue -N- user
+billing -N- notify
+saas2 -N- notify
+notify -1- user
+'Person -N- Birthplace
+'Birthplace -1- Location
+
+@endchen

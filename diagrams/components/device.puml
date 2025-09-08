@@ -1,0 +1,28 @@
+@startuml
+!include <C4/C4_Component>
+
+ContainerDb(database, "Database", "SQL DB")
+Container(noty_api, "Нотификации", "Уведомления пользователей")
+System_Ext(device, "Устройства", "Любые устройства умного дома")
+
+Container(device_api, "Управление устройствами", "CRUD операции, управление, мониторинг") {
+    Component(api, "API", "Rest API")
+    Component(device_manager, "Диспетчер устройств", "CRUD операции с устройствами")
+    Component(dashboard, "Дашборд", "Мониторинг устройств")
+    Component(remote_control, "Пульт управления", "Изменение температуры, открывание ворот и т.д.")
+    Container(queue, "Брокер сообщений", "Очередь для асинхронного взаимодействия между компонентами")
+
+    Rel_D(api, device_manager, "CRUD")
+    Rel_D(api, remote_control, "удалённый контроль устройств")
+    Rel_D(api, dashboard, "мониторинг")
+}
+
+Rel_R(dashboard, database, "Поиск типа устройства и т.д.")
+Rel_D(remote_control, database, "Управление устройством")
+Rel_D(device_manager, database, "Запись")
+Rel_D(device_manager, device, "Пинг")
+Rel_D(dashboard, device, "Пинг")
+Rel_D(remote_control, device, "Управление устройством")
+Rel_L(dashboard, queue, "Отправка событий")
+Rel_L(queue, noty_api, "Отправка событий")
+@enduml
