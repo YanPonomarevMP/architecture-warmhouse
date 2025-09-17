@@ -1,0 +1,47 @@
+@startuml
+!include <C4/C4_Container>
+
+Person(user, "Пользователь")
+Person(admin, "Администратор")
+
+System_Ext(device, "Устройства", "Любые устройства умного дома")
+System_Ext(communication_channel, "Канал коммуникации", "SMTP-сервер, SMS-сервер")
+System_Ext(fiscal_authority, "Фискальный орган")
+System_Ext(acquiring, "интернет эквайринг")
+
+Boundary(SMART_NOME, "Smart Home", "Компоненты нашей системы") {
+    ContainerDb(database, "Database", "SQL DB")
+    Container(user_api, "Управление пользователями", "Регистрация, раздача прав и т.д.")
+    Container(device_api, "Управление устройствами", "CRUD операции, управление, мониторинг")
+    Container(billing_api, "Биллинг", "Покупки, рекурренты, скидки")
+    Container(noty_api, "Нотификации", "Уведомления пользователей")
+    Container(queue, "Брокер сообщений", "Очередь для асинхронного взаимодействия между компонентами")
+
+    Rel_D(user, device_api, "подключение,   управление и т.д.")
+    Rel_D(device_api, database, "Запись")
+    Rel_D(device_api, queue, "асинхронная нотификация пользователю")
+
+    Rel_D(user, user_api, "регистрация, авторизация и т.д.")
+    Rel_D(user, billing_api, "Покупка")
+    Rel_D(user_api, database, "Запись")
+    Rel_D(user_api, queue, "асинхронная нотификация пользователю")
+
+    Rel_D(billing_api, database, "Запись")
+    Rel(billing_api, queue, "асинхронная нотификация пользователю")
+
+
+    Rel_D(noty_api, database, "Запись")
+
+    Rel_D(admin, billing_api, "создание промоакций, управление тарифами")
+    Rel_D(admin, noty_api, "создание шаблонов писем")
+    Rel_D(admin, device_api, "администрирование устройств")
+
+    Rel_D(queue, noty_api, "асинхронная нотификация пользователю")
+}
+
+
+Rel(device_api, device, "Открыть ворота, изменить температуру, проверить статус и т.д")
+Rel(billing_api, acquiring, "Проведение платежей")
+Rel(billing_api, fiscal_authority, "Фискализация")
+Rel(noty_api, communication_channel, "Отправка писем")
+@enduml

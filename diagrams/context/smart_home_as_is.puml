@@ -1,0 +1,13 @@
+@startuml
+!include <C4/C4_Context>
+
+Person(user, "Пользователь")
+System(monolith, "Умный дом", "Система для удалённого управление отоплением в доме")
+System_Ext(device, "Устройство", "Система отопления")
+
+
+Rel_D(user, monolith, Управление отоплением в доме и отслеживание температуры в реальном времени)
+
+Rel_D(monolith, device, Информации о температуре по id датчика или локации)
+Rel_U(device, monolith, Температура)
+@enduml

@@ -1,0 +1,30 @@
+@startuml
+!include <C4/C4_Component>
+
+System_Ext(fiscal_authority, "Фискальный орган")
+System_Ext(acquiring, "интернет эквайринг")
+Container(noty_api, "Нотификации", "Уведомления пользователей")
+ContainerDb(database, "Database", "SQL DB")
+
+Container(billing_api, "Биллинг", "Покупки, рекурренты, скидки") {
+    Component(api, "API", "Rest API")
+    Component(purchases, "Покупки", "Заведение тарифов, расчёт итоговой цены с учётом скидок")
+    Component(payments, "Платежи", "Платежи, возвраты")
+    Component(fiscal, "Фискализация", "Управление чеками")
+    Component(recurrent, "Рекурренты", "Регулярные списания")
+    Component(queue, "Брокер сообщений", "Очередь для асинхронного взаимодействия между компонентами")
+
+    Rel_D(api, purchases, "Создание тарифов, создание промо и т.д.")
+    Rel_D(purchases, payments, "Проведение платежей")
+    Rel_D(payments, queue, "Асинхронное создание чеков")
+    Rel_D(queue, fiscal, "Асинхронное создание чеков")
+    Rel_D(queue, recurrent, "Проведение рекуррентных платежей")
+}
+
+Rel(payments, acquiring, "Платёж")
+Rel(payments, database, "Запись")
+Rel(fiscal, fiscal_authority, "Выставление чеков")
+Rel(queue, noty_api, "Уведомление пользователей")
+Rel(purchases, database, "Запись")
+Rel(recurrent, database, "Запись")
+@enduml

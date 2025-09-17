@@ -1,0 +1,24 @@
+@startuml
+!include <C4/C4_Component>
+
+ContainerDb(database, "Database", "SQL DB")
+Container(billing_api, "Биллинг", "Покупки, рекурренты, скидки")
+
+Container(User_API, "Управление пользователями", "Регистрация, раздача прав и т.д.") {
+    Component(api, "API", "Rest API")
+    Component(registration, "Регистрация", "Создание пользователей в БД")
+    Component(authorization, "Авторизация", "Проверка прав, раздача прав")
+    Component(security, "Обеспечение безопасности", "Шифрование чувствительных данных")
+    Component(token, "Права доступа", "Генерация токенов доступа")
+
+    Rel_D(api, registration, "регистрация")
+    Rel_D(api, authorization, "авторизация")
+    Rel_D(api, token, "Выдача токенов")
+    Rel_D(registration, security, "шифрование")
+    Rel_D(authorization, security, "шифрование")
+    Rel(token, security, "шифрование")
+    Rel_D(security, database, "Запись")
+}
+
+Rel_D(token, billing_api, "Изменение прав доступа")
+@enduml
