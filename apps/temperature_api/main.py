@@ -1,8 +1,9 @@
+import datetime
 from enum import Enum
 import random
 
 from fastapi import FastAPI
-from pydantic import BaseModel
+from pydantic import BaseModel, Field, ConfigDict
 from starlette import status
 
 app = FastAPI()
@@ -43,7 +44,16 @@ class Device(BaseModel):
 
 
 class TemperatureResponse(BaseModel):
-    temperature: int
+    value: float = Field(..., alias="Value")
+    unit: str = Field("unit", alias="Unit")
+    status: str = Field("status", alias="Status")
+    timestamp: datetime.datetime = Field(..., alias="Timestamp")
+    location: str = Field(..., alias="Location")
+    sensorid: str = Field("sensorid", alias="SensorID")
+    sensortype: str = Field("sensortype", alias="SensorType")
+    description: str = Field("description", alias="Description")
+
+    model_config = ConfigDict(validate_by_name=True, serialize_by_alias=True)
 
 
 class DeviceBody(BaseModel):
@@ -100,7 +110,7 @@ async def turn_off_device(id_or_slug: str, status_body: StatusBody):
 
 
 @app.get(
-    "/temperature",
+    "/temperature/{location}",
     response_model=TemperatureResponse,
     name="devices:get_temperature_by_location",
     status_code=status.HTTP_200_OK,
@@ -108,4 +118,5 @@ async def turn_off_device(id_or_slug: str, status_body: StatusBody):
 )
 async def get_temperature_by_location(location: str):
     temperature = random.randint(-100, 100)
-    return TemperatureResponse(temperature=temperature)
+    timestamp = datetime.datetime.now(tz=datetime.timezone.utc)
+    return TemperatureResponse(value=temperature, location=location, timestamp=timestamp)
